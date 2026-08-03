@@ -49,6 +49,11 @@ application {
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
+    // Always run. Gradle would otherwise report UP-TO-DATE and skip the task when nothing
+    // changed, which looks identical to a successful run -- and the suite is only a few
+    // seconds. Delete this line to get incremental behaviour back.
+    outputs.upToDateWhen { false }
+
     testLogging {
         // Print a line per test. Without this Gradle only reports failures, which makes a
         // container test that self-skipped (no Docker) look identical to one that passed.
