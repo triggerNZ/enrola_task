@@ -40,4 +40,8 @@ tasks.named<Test>("test") {
 // bootRun otherwise runs from app/, where it would miss the .env at the repo root.
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     workingDir = rootProject.projectDir
+
+    // Without this, Gradle hands the app an empty stdin and the chat loop sees
+    // EOF immediately and exits.
+    standardInput = System.`in`
 }
