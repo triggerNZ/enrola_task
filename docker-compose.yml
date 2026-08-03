@@ -1,0 +1,33 @@
+# Local Postgres for development.
+#
+# Credentials come from .env, which Compose reads automatically for variable
+# substitution. The same file is imported by Spring (see
+# application.properties), so both sides stay in sync from one source.
+#
+#   docker compose up -d       start
+#   docker compose down        stop (data survives in the named volume)
+#   docker compose down -v     stop and delete the data
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-enrola}
+      POSTGRES_USER: ${POSTGRES_USER:-enrola}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+    ports:
+      # Host 5433 by default: 5432 is already taken by another project on this
+      # machine. Only the host side is remapped; inside the container it is 5432.
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-enrola} -d ${POSTGRES_DB:-enrola}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  postgres-data:

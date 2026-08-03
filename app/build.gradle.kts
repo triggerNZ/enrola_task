@@ -18,6 +18,11 @@ dependencies {
     implementation(libs.spring.boot.starter)
 
     implementation(libs.langchain4j.open.ai)
+    implementation(libs.langchain4j)
+
+    // DataSource + JdbcTemplate + HikariCP. Versions come from the Boot BOM.
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    runtimeOnly("org.postgresql:postgresql")
 
     testImplementation(libs.spring.boot.starter.test)
     testRuntimeOnly(libs.junit.platform.launcher)
