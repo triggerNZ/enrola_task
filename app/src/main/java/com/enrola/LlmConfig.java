@@ -18,8 +18,6 @@ public class LlmConfig {
             @Value("${openai.max-completion-tokens}") int maxCompletionTokens,
             @Value("${openai.timeout}") Duration timeout) {
 
-        // maxCompletionTokens, not maxTokens: the latter maps to the legacy
-        // `max_tokens` field, which the gpt-5 family rejects.
         return OpenAiChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(model)
