@@ -20,12 +20,20 @@ dependencies {
     implementation(libs.langchain4j.open.ai)
     implementation(libs.langchain4j)
 
-    // DataSource + JdbcTemplate + HikariCP. Versions come from the Boot BOM.
-    implementation("org.springframework.boot:spring-boot-starter-jdbc")
-    runtimeOnly("org.postgresql:postgresql")
+    // DataSource + JdbcClient + HikariCP. Versions come from the Boot BOM.
+    implementation(libs.spring.boot.starter.jdbc)
+    runtimeOnly(libs.postgresql)
+
+    // Schema migrations. Both are needed: the first carries the autoconfiguration,
+    // the second teaches Flyway how to talk to Postgres.
+    implementation(libs.spring.boot.flyway)
+    runtimeOnly(libs.flyway.database.postgresql)
 
     testImplementation(libs.spring.boot.starter.test)
     testRuntimeOnly(libs.junit.platform.launcher)
+    testImplementation(libs.spring.boot.testcontainers)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.junit.jupiter)
 }
 
 java {
