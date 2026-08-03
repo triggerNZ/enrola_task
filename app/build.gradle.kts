@@ -48,13 +48,22 @@ application {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+
+    testLogging {
+        // Print a line per test. Without this Gradle only reports failures, which makes a
+        // container test that self-skipped (no Docker) look identical to one that passed.
+        events(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+        )
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showCauses = true
+        showStackTraces = true
+    }
 }
 
 // bootRun otherwise runs from app/, where it would miss the .env at the repo root.
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     workingDir = rootProject.projectDir
-
-    // Without this, Gradle hands the app an empty stdin and the chat loop sees
-    // EOF immediately and exits.
-    standardInput = System.`in`
 }
