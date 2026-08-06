@@ -1,0 +1,114 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: page('Conversation', ~{::#body})}">
+  <body>
+    <div id="body">
+      <h1 th:text="${conversation.title} ?: 'Conversation'">Outreach to Lauren</h1>
+      <p class="muted">
+        <span th:text="${conversation.messageCount}">6</span> messages.
+        <span th:if="${conversation.closed()}">
+          Ended: <span th:text="${conversation.closedReason}">callback</span>.
+          <span th:if="${conversation.closingNote()}" th:text="${conversation.closingNote()}"></span>
+        </span>
+        <span th:unless="${conversation.closed()}">Still open.</span>
+      </p>
+
+      <div th:if="${saved}" class="saved">Review saved.</div>
+
+      <!--
+        What the agent was told when this conversation ran. A poor conversation is only
+        actionable if you can read the instructions that produced it, and know whether they
+        are still the ones in force.
+      -->
+      <div class="prompts-used">
+        <span class="who">Prompts used</span>
+        <p th:if="${#lists.isEmpty(promptsUsed)}" class="muted">
+          Not recorded — this conversation predates prompt versioning.
+        </p>
+        <dl th:unless="${#lists.isEmpty(promptsUsed)}">
+          <th:block th:each="p : ${promptsUsed}">
+            <dt>
+              <a
+                th:href="@{/admin/prompts/{kind}/{version}(kind=${p.kind.slug()},version=${p.version})}"
+                th:text="${p.label()}">
+                Agent brief v2
+              </a>
+            </dt>
+            <dd th:if="${p.current()}" class="muted">current</dd>
+            <dd
+              th:unless="${p.current()}"
+              class="superseded"
+              th:with="live=${currentPrompts.get(p.kind)}"
+              th:text="${live != null} ? 'superseded by v' + ${live.version} : 'superseded'">
+              superseded by v4
+            </dd>
+          </th:block>
+        </dl>
+      </div>
+
+      <div class="transcript">
+        <p th:if="${#lists.isEmpty(messages)}" class="muted">No messages.</p>
+        <!--
+          th:text throughout, never th:utext: every one of these strings came from a
+          customer or a language model, and a transcript is the last place to trust markup.
+        -->
+        <div
+          th:each="m : ${messages}"
+          class="msg"
+          th:classappend="${m.type == 'AI'} ? 'ai' : (${m.hasToolCalls() or m.isToolResult()} ? 'tool' : '')">
+          <div
+            class="who"
+            th:text="${m.type == 'AI'} ? 'Agent' : (${m.type == 'USER'} ? 'Lead' : (${m.isToolResult()} ? 'Tool result' : ${m.type}))">
+            Agent
+          </div>
+
+          <div class="tool-name" th:if="${m.isToolResult()}">
+            returned by <code th:text="${m.toolName}">find_policies</code>
+          </div>
+
+          <div class="text" th:if="${m.text != null}" th:text="${m.text}">Hi Lauren…</div>
+
+          <!-- What the model asked to run, and exactly what it passed. -->
+          <div class="tool-call" th:each="call : ${m.toolCalls}">
+            called <code th:text="${call.name}">find_policies</code>
+            <span th:if="${#lists.isEmpty(call.arguments)}" class="muted">with no arguments</span>
+            <dl th:unless="${#lists.isEmpty(call.arguments)}">
+              <th:block th:each="arg : ${call.arguments}">
+                <dt th:text="${arg.name}">tier</dt>
+                <dd th:text="${arg.value}">GOLD</dd>
+              </th:block>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <form class="review" method="post" th:action="@{/admin/conversations/{id}/review(id=${conversation.id})}">
+        <fieldset class="stars">
+          <legend>Rating</legend>
+          <label th:each="n : ${#numbers.sequence(1, 5)}">
+            <input
+              type="radio"
+              name="rating"
+              th:value="${n}"
+              th:checked="${review != null and review.rating == n}"
+              required />
+            <span th:text="${n}">1</span>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>What should have gone better?</legend>
+          <textarea name="comment" th:text="${review != null} ? ${review.comment} : ''"></textarea>
+        </fieldset>
+
+        <button type="submit">Save review</button>
+        <span
+          th:if="${review != null}"
+          class="muted"
+          th:text="'Last reviewed by ' + (${review.reviewer} ?: 'someone')">
+        </span>
+      </form>
+    </div>
+  </body>
+</html>

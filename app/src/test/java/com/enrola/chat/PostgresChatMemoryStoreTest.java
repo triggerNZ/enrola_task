@@ -1,4 +1,4 @@
-package com.enrola;
+package com.enrola.chat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +28,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
  * {@link MessageReconcilerTest}.
  */
 @Testcontainers(disabledWithoutDocker = true)
-@SpringBootTest(properties = "openai.api-key=")
+@SpringBootTest(properties = {"openai.api-key=test-key", "admin.password=test"})
 class PostgresChatMemoryStoreTest {
 
     @Container @ServiceConnection
@@ -38,7 +38,7 @@ class PostgresChatMemoryStoreTest {
     @Autowired private ConversationRepository conversations;
 
     private UUID newConversation() {
-        return conversations.create("test");
+        return conversations.create(null, "test");
     }
 
     @Test

@@ -1,0 +1,270 @@
+{
+  "_meta": {
+    "description": "Australian private health insurance reference data: hospital product tiers, the clinical categories each tier must cover, what each tier therefore excludes, the major funds, and prices.",
+    "asAt": "2026-08-06",
+    "currency": "AUD",
+    "readThisFirst": [
+      "Fields under 'sourced' are taken from the citations below and can be checked.",
+      "Everything under 'illustrativeProducts' was written for this file. The fund names are real; those policy names, prices and excesses are NOT a real rate card and must not be quoted to a customer.",
+      "Premiums change every 1 April. Anything here is stale after 1 April 2027.",
+      "This file is NOT loaded by the agent. LlmConfig reads agent-brief.md, health-insurance-faq.md and outreach-instruction.md only, and the brief forbids quoting premiums."
+    ],
+    "sources": [
+      "https://www.privatehealth.gov.au/health_insurance/howitworks/clinical_categories.htm",
+      "https://www.health.gov.au/topics/private-health-insurance/what-private-health-insurance-covers/hospital-cover-and-product-tiers",
+      "https://www.finder.com.au/health-insurance/hospital-cover/private-health-insurance-tiers",
+      "https://www.choice.com.au/money/insurance/health/articles/medibank-bupa-hcf-hbf-nib-compared",
+      "https://healthinsurance.au/"
+    ]
+  },
+
+  "sourced": {
+    "tiers": [
+      {
+        "code": "BASIC",
+        "name": "Basic",
+        "categoriesCovered": 3,
+        "coversOnlyOnRestrictedBasis": true,
+        "summary": "Rehabilitation, psychiatric services and palliative care, restricted only. Exempts you from the Medicare Levy Surcharge but covers very little in hospital.",
+        "indicativeMonthlyPremiumSingle": { "average": 89.11, "lowest": 77.36 }
+      },
+      {
+        "code": "BRONZE",
+        "name": "Bronze",
+        "categoriesCovered": 21,
+        "coversOnlyOnRestrictedBasis": false,
+        "summary": "Adds 18 categories including bone/joint/muscle, digestive system, gynaecology and cancer treatment. No heart, no back, no cataracts.",
+        "indicativeMonthlyPremiumSingle": { "average": 106.67, "lowest": 91.82 }
+      },
+      {
+        "code": "SILVER",
+        "name": "Silver",
+        "categoriesCovered": 30,
+        "coversOnlyOnRestrictedBasis": false,
+        "summary": "Adds 9 more including heart and vascular, back/neck/spine, dental surgery and cataracts. Still no pregnancy and no joint replacements.",
+        "indicativeMonthlyPremiumSingle": { "average": 169.18, "lowest": 115.04 }
+      },
+      {
+        "code": "GOLD",
+        "name": "Gold",
+        "categoriesCovered": 38,
+        "coversOnlyOnRestrictedBasis": false,
+        "summary": "All 38 clinical categories, unrestricted. The only tier that must cover pregnancy and birth, joint replacements, weight loss surgery and dialysis.",
+        "indicativeMonthlyPremiumSingle": { "average": 312.74, "lowest": 187.39 }
+      }
+    ],
+
+    "premiumAssumptions": {
+      "note": "The indicative premiums above are not comparable to a quote. They assume all of the following.",
+      "state": "NSW (Sydney)",
+      "cover": "single, hospital only",
+      "excess": 750,
+      "income": "under $101,000, so the maximum government rebate applies",
+      "lifetimeHealthCoverLoading": "none",
+      "ageBasedDiscount": "none",
+      "effective": "April 2026",
+      "stateVariation": "Premiums are set per state, not per suburb: the same policy costs the same in Bondi, Bowral or Broken Hill. Victoria is the most expensive state; NSW sits close to the national average."
+    },
+
+    "plusPolicies": {
+      "explanation": "A fund may cover more than a tier's minimum and market the policy as Basic Plus, Bronze Plus or Silver Plus. There is no 'Gold Plus' — Gold already covers everything.",
+      "consequence": "Two policies at the same tier are not equivalent. A Bronze Plus may include cataracts while another Bronze does not, so the tier alone does not tell you what is covered."
+    },
+
+    "clinicalCategories": [
+      { "name": "Rehabilitation", "minimumTier": "BASIC", "restrictedUntil": "GOLD" },
+      { "name": "Hospital psychiatric services", "minimumTier": "BASIC", "restrictedUntil": "GOLD" },
+      { "name": "Palliative care", "minimumTier": "BASIC", "restrictedUntil": "GOLD" },
+
+      { "name": "Brain and nervous system", "minimumTier": "BRONZE" },
+      { "name": "Eye (not cataracts)", "minimumTier": "BRONZE" },
+      { "name": "Ear, nose and throat", "minimumTier": "BRONZE" },
+      { "name": "Tonsils, adenoids and grommets", "minimumTier": "BRONZE" },
+      { "name": "Bone, joint and muscle", "minimumTier": "BRONZE" },
+      { "name": "Joint reconstructions", "minimumTier": "BRONZE" },
+      { "name": "Kidney and bladder", "minimumTier": "BRONZE" },
+      { "name": "Male reproductive system", "minimumTier": "BRONZE" },
+      { "name": "Digestive system", "minimumTier": "BRONZE" },
+      { "name": "Hernia and appendix", "minimumTier": "BRONZE" },
+      { "name": "Gastrointestinal endoscopy", "minimumTier": "BRONZE" },
+      { "name": "Gynaecology", "minimumTier": "BRONZE" },
+      { "name": "Miscarriage and termination of pregnancy", "minimumTier": "BRONZE" },
+      { "name": "Chemotherapy, radiotherapy and immunotherapy for cancer", "minimumTier": "BRONZE" },
+      { "name": "Pain management", "minimumTier": "BRONZE" },
+      { "name": "Skin", "minimumTier": "BRONZE" },
+      { "name": "Breast surgery (medically necessary)", "minimumTier": "BRONZE" },
+      { "name": "Diabetes management (excluding insulin pumps)", "minimumTier": "BRONZE" },
+
+      { "name": "Heart and vascular system", "minimumTier": "SILVER" },
+      { "name": "Lung and chest", "minimumTier": "SILVER" },
+      { "name": "Blood", "minimumTier": "SILVER" },
+      { "name": "Back, neck and spine", "minimumTier": "SILVER" },
+      { "name": "Plastic and reconstructive surgery (medically necessary)", "minimumTier": "SILVER" },
+      { "name": "Dental surgery", "minimumTier": "SILVER" },
+      { "name": "Podiatric surgery", "minimumTier": "SILVER" },
+      { "name": "Hearing devices", "minimumTier": "SILVER" },
+      { "name": "Cataracts", "minimumTier": "SILVER" },
+
+      { "name": "Joint replacements", "minimumTier": "GOLD" },
+      { "name": "Dialysis for chronic kidney failure", "minimumTier": "GOLD" },
+      { "name": "Pregnancy and birth", "minimumTier": "GOLD" },
+      { "name": "Assisted reproductive services", "minimumTier": "GOLD" },
+      { "name": "Weight loss surgery", "minimumTier": "GOLD" },
+      { "name": "Insulin pumps", "minimumTier": "GOLD" },
+      { "name": "Pain management with device", "minimumTier": "GOLD" },
+      { "name": "Sleep studies", "minimumTier": "GOLD" }
+    ],
+
+    "exclusionsByTier": {
+      "note": "The categories a tier is NOT required to cover. A specific policy may cover more (see plusPolicies), never less.",
+      "BASIC": [
+        "Brain and nervous system", "Eye (not cataracts)", "Ear, nose and throat",
+        "Tonsils, adenoids and grommets", "Bone, joint and muscle", "Joint reconstructions",
+        "Kidney and bladder", "Male reproductive system", "Digestive system",
+        "Hernia and appendix", "Gastrointestinal endoscopy", "Gynaecology",
+        "Miscarriage and termination of pregnancy",
+        "Chemotherapy, radiotherapy and immunotherapy for cancer", "Pain management", "Skin",
+        "Breast surgery (medically necessary)", "Diabetes management (excluding insulin pumps)",
+        "Heart and vascular system", "Lung and chest", "Blood", "Back, neck and spine",
+        "Plastic and reconstructive surgery (medically necessary)", "Dental surgery",
+        "Podiatric surgery", "Hearing devices", "Cataracts", "Joint replacements",
+        "Dialysis for chronic kidney failure", "Pregnancy and birth",
+        "Assisted reproductive services", "Weight loss surgery", "Insulin pumps",
+        "Pain management with device", "Sleep studies"
+      ],
+      "BRONZE": [
+        "Heart and vascular system", "Lung and chest", "Blood", "Back, neck and spine",
+        "Plastic and reconstructive surgery (medically necessary)", "Dental surgery",
+        "Podiatric surgery", "Hearing devices", "Cataracts", "Joint replacements",
+        "Dialysis for chronic kidney failure", "Pregnancy and birth",
+        "Assisted reproductive services", "Weight loss surgery", "Insulin pumps",
+        "Pain management with device", "Sleep studies"
+      ],
+      "SILVER": [
+        "Joint replacements", "Dialysis for chronic kidney failure", "Pregnancy and birth",
+        "Assisted reproductive services", "Weight loss surgery", "Insulin pumps",
+        "Pain management with device", "Sleep studies"
+      ],
+      "GOLD": []
+    },
+
+    "providers": [
+      { "name": "Medibank", "includes": ["ahm"], "marketSharePct": 26.7, "premiumIncrease2026Pct": 5.10 },
+      { "name": "Bupa", "marketSharePct": 25.4, "premiumIncrease2026Pct": 4.80 },
+      { "name": "HCF", "marketSharePct": 12.6, "premiumIncrease2026Pct": 4.96 },
+      { "name": "nib", "marketSharePct": 9.7, "premiumIncrease2026Pct": 5.47 },
+      { "name": "HBF", "marketSharePct": 8.1, "premiumIncrease2026Pct": 2.15 }
+    ],
+
+    "premiumRound2026": {
+      "industryAveragePct": 4.41,
+      "effectiveFrom": "2026-04-01",
+      "note": "Largest annual increase since 2017. Increases are approved by the Minister for Health and apply from 1 April each year."
+    },
+
+    "sampledListings": {
+      "note": "Real listings observed on healthinsurance.au on 2026-08-05. The page did not state whether each price was for a single, couple or family, which is why HCF and HBF look so far apart — do not read these as like-for-like.",
+      "coverBasis": "not stated on the source page",
+      "listings": [
+        { "provider": "HCF", "policy": "Silver Plus Hospital + Smart Extras", "monthlyPremium": 412.00, "hospitalExcess": 500 },
+        { "provider": "HBF", "policy": "Silver Plus Premium Combined", "monthlyPremium": 136.00, "hospitalExcess": 500 },
+        { "provider": "Medibank", "policy": "Growing Family Silver Plus", "monthlyPremium": 214.00, "hospitalExcess": 500 }
+      ]
+    }
+  },
+
+  "illustrativeProducts": {
+    "WARNING": "Invented for testing. Fund names are real; policy names, premiums and excesses are not. Never quote these to a customer.",
+    "basis": "single, hospital only, NSW, $750 excess unless stated, maximum rebate applied",
+    "products": [
+      {
+        "id": "medibank-basic-starter",
+        "provider": "Medibank",
+        "policy": "Starter Basic Hospital",
+        "tier": "BASIC",
+        "monthlyPremium": 84.50,
+        "hospitalExcess": 750,
+        "aboveTierMinimum": [],
+        "productExclusions": ["No benefits outside Medibank agreement hospitals except in an emergency."]
+      },
+      {
+        "id": "bupa-basic-plus-simple",
+        "provider": "Bupa",
+        "policy": "Simple Basic Plus Hospital",
+        "tier": "BASIC",
+        "monthlyPremium": 102.30,
+        "hospitalExcess": 750,
+        "aboveTierMinimum": ["Ear, nose and throat", "Tonsils, adenoids and grommets"],
+        "productExclusions": ["Restricted cover only for rehabilitation, psychiatric and palliative care."]
+      },
+      {
+        "id": "nib-bronze-core",
+        "provider": "nib",
+        "policy": "Core Bronze Hospital",
+        "tier": "BRONZE",
+        "monthlyPremium": 108.90,
+        "hospitalExcess": 750,
+        "aboveTierMinimum": [],
+        "productExclusions": []
+      },
+      {
+        "id": "hcf-bronze-plus-active",
+        "provider": "HCF",
+        "policy": "Active Bronze Plus Hospital",
+        "tier": "BRONZE",
+        "monthlyPremium": 131.75,
+        "hospitalExcess": 500,
+        "aboveTierMinimum": ["Cataracts", "Back, neck and spine"],
+        "productExclusions": []
+      },
+      {
+        "id": "hbf-silver-everyday",
+        "provider": "HBF",
+        "policy": "Everyday Silver Hospital",
+        "tier": "SILVER",
+        "monthlyPremium": 158.40,
+        "hospitalExcess": 750,
+        "aboveTierMinimum": [],
+        "productExclusions": []
+      },
+      {
+        "id": "medibank-silver-plus-growing",
+        "provider": "Medibank",
+        "policy": "Growing Silver Plus Hospital",
+        "tier": "SILVER",
+        "monthlyPremium": 196.20,
+        "hospitalExcess": 500,
+        "aboveTierMinimum": ["Joint replacements"],
+        "productExclusions": ["Pregnancy and birth is not covered at this tier."]
+      },
+      {
+        "id": "bupa-gold-complete",
+        "provider": "Bupa",
+        "policy": "Complete Gold Hospital",
+        "tier": "GOLD",
+        "monthlyPremium": 289.60,
+        "hospitalExcess": 750,
+        "aboveTierMinimum": [],
+        "productExclusions": []
+      },
+      {
+        "id": "hcf-gold-top",
+        "provider": "HCF",
+        "policy": "Top Gold Hospital",
+        "tier": "GOLD",
+        "monthlyPremium": 341.05,
+        "hospitalExcess": 0,
+        "aboveTierMinimum": [],
+        "productExclusions": []
+      }
+    ]
+  },
+
+  "waitingPeriods": {
+    "note": "Maximums set by law. A fund may be shorter, never longer. Time already served on an equivalent level of cover carries over when switching.",
+    "preExistingConditionsMonths": 12,
+    "pregnancyAndBirthMonths": 12,
+    "psychiatricRehabPalliativeMonths": 2,
+    "everythingElseHospitalMonths": 2
+  }
+}

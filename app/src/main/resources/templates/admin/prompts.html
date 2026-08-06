@@ -1,0 +1,41 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: page('Prompts', ~{::#body})}">
+  <body>
+    <div id="body">
+      <h1>Prompts</h1>
+      <p class="muted">
+        What the agent is told. Editing appends a new version and makes it current; conversations
+        already under way keep the versions they opened with.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Prompt</th>
+            <th>Current</th>
+            <th>Changed</th>
+            <th>By</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="p : ${prompts}">
+            <td>
+              <a th:href="@{/admin/prompts/{kind}(kind=${p.kind.slug()})}" th:text="${p.kind.displayName()}">
+                Agent brief
+              </a>
+            </td>
+            <td th:text="'v' + ${p.version}">v2</td>
+            <td
+              class="muted"
+              th:text="${#temporals.format(p.createdAt.atZone(T(java.time.ZoneId).systemDefault()), 'd MMM HH:mm')}">
+              6 Aug 09:20
+            </td>
+            <td class="muted" th:text="${p.createdBy} ?: 'seeded from the repo'">admin</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

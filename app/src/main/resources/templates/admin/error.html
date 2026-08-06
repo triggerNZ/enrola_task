@@ -1,0 +1,12 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: page('Problem', ~{::#body})}">
+  <body>
+    <div id="body">
+      <h1>That did not work</h1>
+      <p th:text="${message}">No conversation with that id.</p>
+      <p><a href="/admin/conversations">Back to all conversations</a></p>
+    </div>
+  </body>
+</html>

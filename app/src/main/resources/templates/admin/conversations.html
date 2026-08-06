@@ -1,0 +1,53 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: page('Conversations', ~{::#body})}">
+  <body>
+    <div id="body">
+      <h1>Conversations</h1>
+      <p class="muted">
+        <span th:text="${#lists.size(conversations)}">0</span> shown.
+        <a th:if="${!unreviewed}" href="/admin/conversations?unreviewed=true">Unreviewed only</a>
+        <a th:if="${unreviewed}" href="/admin/conversations">Show all</a>
+      </p>
+
+      <p th:if="${#lists.isEmpty(conversations)}" class="muted">
+        Nothing to review yet. Start a conversation with <code>./chat.sh</code>.
+      </p>
+
+      <table th:unless="${#lists.isEmpty(conversations)}">
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Opening</th>
+            <th>Messages</th>
+            <th>Ended</th>
+            <th>Last used</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="c : ${conversations}">
+            <td>
+              <a th:href="@{/admin/conversations/{id}(id=${c.id})}" th:text="${c.leadName} ?: 'no lead'">
+                Lauren
+              </a>
+            </td>
+            <td th:text="${c.title} ?: '—'">Outreach to Lauren</td>
+            <td th:text="${c.messageCount}">6</td>
+            <td th:text="${c.closedReason} ?: 'open'">callback</td>
+            <td
+              class="muted"
+              th:text="${#temporals.format(c.lastUsedAt.atZone(T(java.time.ZoneId).systemDefault()), 'd MMM HH:mm')}">
+              6 Aug 09:20
+            </td>
+            <td class="rating">
+              <span th:if="${c.reviewed()}" th:text="${c.rating} + ' / 5'">4 / 5</span>
+              <span th:unless="${c.reviewed()}" class="muted">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

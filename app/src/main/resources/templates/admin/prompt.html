@@ -1,0 +1,35 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: page('Prompt', ~{::#body})}">
+  <body>
+    <div id="body">
+      <h1 th:text="${prompt.label()}">Agent brief v2</h1>
+      <p class="muted">
+        <a th:href="@{/admin/prompts/{kind}(kind=${kind.slug()})}" th:text="'All versions of the ' + ${kind.displayName()}">
+          All versions
+        </a>
+        —
+        <span th:if="${prompt.current()}">this is the current version.</span>
+        <span th:unless="${prompt.current()}">superseded; saving it will make it current again.</span>
+        Saved <span th:text="${#temporals.format(prompt.createdAt.atZone(T(java.time.ZoneId).systemDefault()), 'd MMM yyyy HH:mm')}">6 Aug 09:20</span>
+        by <span th:text="${prompt.createdBy} ?: 'the repo'">admin</span>.
+      </p>
+
+      <!--
+        th:text, never th:utext: a prompt body is markdown somebody typed into a browser, and
+        rendering it as HTML would be the same stored-XSS mistake as the review comment.
+      -->
+      <form class="review" method="post" th:action="@{/admin/prompts/{kind}(kind=${kind.slug()})}">
+        <fieldset>
+          <legend>Body</legend>
+          <textarea name="body" class="prompt-body" th:text="${prompt.body}"></textarea>
+        </fieldset>
+        <button type="submit">Save as a new current version</button>
+        <span class="muted">
+          This never edits v<span th:text="${prompt.version}">2</span>; it appends the next version.
+        </span>
+      </form>
+    </div>
+  </body>
+</html>

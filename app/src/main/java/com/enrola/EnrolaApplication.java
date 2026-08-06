@@ -2,15 +2,15 @@ package com.enrola;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class EnrolaApplication {
 
     public static void main(String[] args) {
-        // Close the context and forward the exit code so the process reports
-        // failures to the shell instead of always exiting 0.
-        ConfigurableApplicationContext context = SpringApplication.run(EnrolaApplication.class, args);
-        System.exit(SpringApplication.exit(context));
+        // Just run: for a web application `run` returns as soon as startup finishes and the
+        // server keeps the JVM alive. Calling SpringApplication.exit here -- as this did
+        // while the chat loop lived in an ApplicationRunner -- would stop the server the
+        // moment it had started.
+        SpringApplication.run(EnrolaApplication.class, args);
     }
 }

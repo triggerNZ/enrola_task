@@ -1,5 +1,5 @@
 plugins {
-    // Adds `run` and the start scripts / distribution for a CLI application.
+    // Declares the main class and adds `run` / the start scripts and distribution.
     application
     alias(libs.plugins.spring.boot)
 }
@@ -14,8 +14,13 @@ dependencies {
     implementation(platform(libs.spring.boot.dependencies))
     testImplementation(platform(libs.spring.boot.dependencies))
 
-    // Core starter only -- no `spring-boot-starter-web`, so no embedded server.
-    implementation(libs.spring.boot.starter)
+    // Embedded Tomcat + Spring MVC + Jackson: the app serves the chat over HTTP.
+    // The client is chat.sh, which talks to it with curl.
+    implementation(libs.spring.boot.starter.web)
+
+    // The admin UI: Thymeleaf renders it, Spring Security keeps it to admins.
+    implementation(libs.spring.boot.starter.thymeleaf)
+    implementation(libs.spring.boot.starter.security)
 
     implementation(libs.langchain4j.open.ai)
     implementation(libs.langchain4j)
@@ -30,6 +35,8 @@ dependencies {
     runtimeOnly(libs.flyway.database.postgresql)
 
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.boot.starter.webmvc.test)
+    testImplementation(libs.spring.security.test)
     testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.spring.boot.testcontainers)
     testImplementation(libs.testcontainers.postgresql)

@@ -9,7 +9,11 @@ spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-depe
 langchain4j-open-ai = { module = "dev.langchain4j:langchain4j-open-ai", version.ref = "langchain4j" }
 # Main module -- carries dev.langchain4j.memory.chat.* (MessageWindowChatMemory).
 langchain4j = { module = "dev.langchain4j:langchain4j", version.ref = "langchain4j" }
-spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+# Server-rendered admin pages, and a password on the door in front of them.
+spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf" }
+spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+thymeleaf-extras-springsecurity = { module = "org.thymeleaf.extras:thymeleaf-extras-springsecurity6" }
 spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }
 postgresql = { module = "org.postgresql:postgresql" }
 
@@ -21,6 +25,11 @@ spring-boot-flyway = { module = "org.springframework.boot:spring-boot-flyway" }
 flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
 
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+# @WithMockUser and the csrf() request post-processor, for testing the admin pages.
+spring-security-test = { module = "org.springframework.security:spring-security-test" }
+# Boot 4 splits the test slices out of spring-boot-test-autoconfigure: @WebMvcTest and
+# MockMvc live here, not in spring-boot-starter-test.
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 # Testcontainers 2.x renamed its artifacts (testcontainers-postgresql, not postgresql).
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }

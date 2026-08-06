@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -14,10 +15,13 @@ import org.springframework.context.ApplicationContext;
  */
 @SpringBootTest(
         properties = {
-            // @SpringBootTest runs ApplicationRunner beans, so without this ChatRunner would
-            // start a chat -- against the real API and database -- during the test.
-            "openai.api-key=",
-            "spring.flyway.enabled=false"
+            // A placeholder key, because LlmConfig refuses to build the model without one.
+            // Nothing here calls the model, so no request is ever made.
+            "openai.api-key=test-key",
+            "admin.password=test",
+            "spring.flyway.enabled=false",
+            // No database here, so nothing to seed into.
+            "prompts.seed-on-start=false"
         })
 class EnrolaApplicationTests {
 

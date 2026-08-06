@@ -1,4 +1,4 @@
-package com.enrola;
+package com.enrola.chat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

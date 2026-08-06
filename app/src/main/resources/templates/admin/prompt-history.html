@@ -1,0 +1,49 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: page('Prompt history', ~{::#body})}">
+  <body>
+    <div id="body">
+      <h1 th:text="${kind.displayName()}">Agent brief</h1>
+      <p class="muted">
+        <a href="/admin/prompts">All prompts</a> — newest first. Open any version to read it, and
+        save it to make it current again.
+      </p>
+
+      <div th:if="${saved}" class="saved">
+        Saved as v<span th:text="${saved}">3</span>. New conversations will use it.
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>State</th>
+            <th>Saved</th>
+            <th>By</th>
+            <th>Starts</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="p : ${history}">
+            <td>
+              <a
+                th:href="@{/admin/prompts/{kind}/{version}(kind=${kind.slug()},version=${p.version})}"
+                th:text="'v' + ${p.version}">
+                v2
+              </a>
+            </td>
+            <td th:text="${p.current()} ? 'current' : 'superseded'">current</td>
+            <td
+              class="muted"
+              th:text="${#temporals.format(p.createdAt.atZone(T(java.time.ZoneId).systemDefault()), 'd MMM HH:mm')}">
+              6 Aug 09:20
+            </td>
+            <td class="muted" th:text="${p.createdBy} ?: 'seeded'">admin</td>
+            <td class="muted" th:text="${#strings.abbreviate(p.body, 60)}">You text people who…</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
