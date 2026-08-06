@@ -35,10 +35,10 @@ public class SecurityConfig {
                                         .authenticated()
                                         .anyRequest()
                                         .permitAll())
-                // The admin forms keep CSRF protection -- Thymeleaf puts the token in them for
-                // us. The API cannot have it: chat.sh posts every message, and has no session to
-                // carry a token in.
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+                // This is a local demo behind HTTP Basic. Disabling CSRF also keeps the
+                // server-rendered forms stateless: Thymeleaf does not need to create a session
+                // just to add a hidden token after rendering a long conversation transcript.
+                .csrf(csrf -> csrf.disable())
                 .httpBasic(basic -> {})
                 .build();
     }

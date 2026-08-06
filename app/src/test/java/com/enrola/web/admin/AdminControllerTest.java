@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willThrow;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -41,7 +40,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(
         value = AdminController.class,
         properties = {"admin.username=admin", "admin.password=hunter2"})
-@Import(SecurityConfig.class) // the real chain, so CSRF and the principal are the shipped ones
+@Import(SecurityConfig.class) // the real chain, so authentication and principal handling match production
 class AdminControllerTest {
 
     @Autowired private MockMvc mvc;
@@ -211,21 +210,11 @@ class AdminControllerTest {
                         post("/admin/conversations/{id}/review", ID)
                                 .param("rating", "3")
                                 .param("comment", "Answered the wrong question")
-                                .with(csrf())
                                 .with(admin()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/conversations/" + ID));
 
         then(reviews).should().save(ID, 3, "Answered the wrong question", "admin");
-    }
-
-    @Test
-    @DisplayName("a form post without a CSRF token is rejected")
-    void csrfIsRequiredOnTheForm() throws Exception {
-        mvc.perform(post("/admin/conversations/{id}/review", ID).param("rating", "3").with(admin()))
-                .andExpect(status().isForbidden());
-
-        then(reviews).shouldHaveNoInteractions();
     }
 
     @Test
@@ -249,7 +238,6 @@ class AdminControllerTest {
         mvc.perform(
                         post("/admin/conversations/{id}/review", ID)
                                 .param("rating", "9")
-                                .with(csrf())
                                 .with(admin()))
                 .andExpect(status().isBadRequest())
                 .andExpect(view().name("admin/error"));

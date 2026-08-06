@@ -85,8 +85,8 @@ class SecurityConfigTest {
     }
 
     @Test
-    @DisplayName("and API posts are not blocked by CSRF, which chat.sh cannot carry a token for")
-    void theApiIsExemptFromCsrf() throws Exception {
+    @DisplayName("posts are not blocked by CSRF in the demo")
+    void csrfIsDisabled() throws Exception {
         given(chat.send(any(), any()))
                 .willReturn(
                         new ChatService.Outcome(

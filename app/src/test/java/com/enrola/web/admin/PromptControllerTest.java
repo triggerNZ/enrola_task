@@ -3,7 +3,6 @@ package com.enrola.web.admin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -122,7 +121,6 @@ class PromptControllerTest {
         mvc.perform(
                         post("/admin/prompts/brief")
                                 .param("body", "A new brief.")
-                                .with(csrf())
                                 .with(admin()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/prompts/brief"));
@@ -151,7 +149,7 @@ class PromptControllerTest {
     @DisplayName("prompts are behind the same door as everything else under /admin")
     void promptsNeedAuthentication() throws Exception {
         mvc.perform(get("/admin/prompts")).andExpect(status().isUnauthorized());
-        mvc.perform(post("/admin/prompts/brief").param("body", "x").with(csrf()))
+        mvc.perform(post("/admin/prompts/brief").param("body", "x"))
                 .andExpect(status().isUnauthorized());
     }
 }
