@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title th:text="'Enrola admin — ' + ${title}">Enrola admin</title>
     <!--
-      Inline, because two pages do not justify a stylesheet, an asset pipeline, or a
-      cache-busting story. If this grows past a handful of screens, move it out.
+      Inline, because this small admin does not justify a stylesheet, an asset pipeline, or a
+      cache-busting story. If it grows much further, move this out.
     -->
     <style>
       :root {
@@ -19,16 +19,34 @@
       * { box-sizing: border-box; }
       body {
         margin: 0;
-        padding: 2rem 1.5rem 4rem;
         font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         color: var(--ink);
         background: var(--bg);
       }
-      main { max-width: 60rem; margin: 0 auto; }
+      .admin-shell {
+        display: grid;
+        grid-template-columns: 12rem minmax(0, 60rem);
+        gap: 2rem;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem 1.5rem 4rem;
+      }
+      .side-menu {
+        align-self: start;
+        position: sticky;
+        top: 2rem;
+        background: #fff;
+        border: 1px solid var(--line);
+        padding: 1rem;
+      }
+      .side-menu .brand { display: block; margin-bottom: 0.75rem; font-weight: 700; }
+      .side-menu nav { display: flex; flex-direction: column; gap: 0.25rem; margin: 0; }
+      .side-menu nav a { padding: 0.4rem 0.5rem; text-decoration: none; border-radius: 0.2rem; }
+      .side-menu nav a:hover, .side-menu nav a.active { background: #eef4fa; }
+      main { min-width: 0; }
       h1 { font-size: 1.4rem; margin: 0 0 0.25rem; }
       a { color: var(--accent); }
       .muted { color: var(--muted); font-size: 0.875rem; }
-      nav { margin: 0 0 1.5rem; }
 
       table { width: 100%; border-collapse: collapse; background: #fff; }
       th, td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--line); }
@@ -66,12 +84,35 @@
       textarea.prompt-body { min-height: 28rem; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
       button { font: inherit; padding: 0.5rem 1.1rem; background: var(--accent); color: #fff; border: 0; cursor: pointer; }
       .saved { background: #e8f4ea; border: 1px solid #b8dcc0; padding: 0.5rem 0.75rem; margin-bottom: 1rem; }
+
+      @media (max-width: 48rem) {
+        .admin-shell { grid-template-columns: minmax(0, 1fr); gap: 1rem; padding-top: 1rem; }
+        .side-menu { position: static; }
+        .side-menu .brand { margin-bottom: 0.4rem; }
+        .side-menu nav { flex-direction: row; gap: 0.5rem; }
+      }
     </style>
   </head>
   <body>
-    <main>
-      <nav class="muted"><a href="/admin/conversations">← All conversations</a></nav>
-      <div th:replace="${body}">Page content goes here.</div>
-    </main>
+    <div class="admin-shell">
+      <aside class="side-menu">
+        <a class="brand" href="/admin">Enrola admin</a>
+        <nav aria-label="Admin sections">
+          <a
+            href="/admin/conversations"
+            th:classappend="${title == 'Conversations' or title == 'Conversation'} ? 'active'">
+            Conversations
+          </a>
+          <a
+            href="/admin/prompts"
+            th:classappend="${title == 'Prompts' or title == 'Prompt history' or title == 'Prompt'} ? 'active'">
+            Prompts
+          </a>
+        </nav>
+      </aside>
+      <main>
+        <div th:replace="${body}">Page content goes here.</div>
+      </main>
+    </div>
   </body>
 </html>

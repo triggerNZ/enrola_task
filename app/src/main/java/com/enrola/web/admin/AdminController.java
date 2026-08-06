@@ -1,10 +1,13 @@
 package com.enrola.web.admin;
 
 import com.enrola.chat.ChatService;
+import com.enrola.chat.ConversationMetrics;
 import com.enrola.chat.ConversationSummary;
+import com.enrola.chat.MessageView;
 import com.enrola.chat.PromptService;
 import com.enrola.chat.ReviewService;
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,8 +55,10 @@ public class AdminController {
     @GetMapping("/admin/conversations/{id}")
     String conversation(@PathVariable UUID id, Model model) {
         ConversationSummary conversation = chat.get(id);
+        List<MessageView> messages = chat.transcript(id);
         model.addAttribute("conversation", conversation);
-        model.addAttribute("messages", chat.transcript(id));
+        model.addAttribute("messages", messages);
+        model.addAttribute("metrics", ConversationMetrics.from(messages));
         model.addAttribute("review", reviews.find(id).orElse(null));
         // What the agent was told at the time, and whether that is still what it is told.
         model.addAttribute("promptsUsed", prompts.usedBy(id));

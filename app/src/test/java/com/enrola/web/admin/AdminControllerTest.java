@@ -82,6 +82,8 @@ class AdminControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/conversations"))
                 .andExpect(model().attribute("unreviewed", false))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("class=\"side-menu\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/admin/prompts\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Lauren")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("4 / 5")));
     }
@@ -110,7 +112,40 @@ class AdminControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/conversation"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Hi Lauren")))
+                .andExpect(
+                        content()
+                                .string(
+                                        org.hamcrest.Matchers.allOf(
+                                                org.hamcrest.Matchers.containsString("booking: <span>No</span>"),
+                                                org.hamcrest.Matchers.containsString("STOP: <span>No</span>"))))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Save review")));
+    }
+
+    @Test
+    @DisplayName("the detail page shows booking and STOP metrics from the transcript")
+    void detailShowsConversationMetrics() throws Exception {
+        given(chat.get(ID)).willReturn(conversation());
+        given(chat.transcript(ID))
+                .willReturn(
+                        List.of(
+                                new MessageView(
+                                        "TOOL_EXECUTION_RESULT",
+                                        "Booked: Thu 6 Aug 2:15pm AEST.",
+                                        List.of(),
+                                        "arrange_callback"),
+                                new MessageView("USER", "STOP")));
+        given(reviews.find(ID)).willReturn(Optional.empty());
+
+        mvc.perform(get("/admin/conversations/{id}", ID).with(admin()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Calendar booking:")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("STOP:")))
+                .andExpect(
+                        content()
+                                .string(
+                                        org.hamcrest.Matchers.allOf(
+                                                org.hamcrest.Matchers.containsString("booking: <span>Yes</span>"),
+                                                org.hamcrest.Matchers.containsString("STOP: <span>Yes</span>"))));
     }
 
     @Test

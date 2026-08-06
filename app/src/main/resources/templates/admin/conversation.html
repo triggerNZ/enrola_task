@@ -7,6 +7,8 @@
       <h1 th:text="${conversation.title} ?: 'Conversation'">Outreach to Lauren</h1>
       <p class="muted">
         <span th:text="${conversation.messageCount}">6</span> messages.
+        Calendar booking: <span th:text="${metrics.calendarBooked} ? 'Yes' : 'No'">No</span>.
+        STOP: <span th:text="${metrics.stopped} ? 'Yes' : 'No'">No</span>.
         <span th:if="${conversation.closed()}">
           Ended: <span th:text="${conversation.closedReason}">callback</span>.
           <span th:if="${conversation.closingNote()}" th:text="${conversation.closingNote()}"></span>

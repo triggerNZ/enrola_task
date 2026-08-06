@@ -63,7 +63,12 @@ class PromptControllerTest {
                         .getResponse()
                         .getContentAsString();
 
-        assertThat(html).contains("Agent brief").contains("Health insurance FAQ").contains("v2");
+        assertThat(html)
+                .contains("class=\"side-menu\"")
+                .contains("href=\"/admin/conversations\"")
+                .contains("Agent brief")
+                .contains("Health insurance FAQ")
+                .contains("v2");
     }
 
     @Test

@@ -4,8 +4,6 @@ import com.enrola.agent.ChatAgent;
 import com.enrola.agent.Recipient;
 import com.enrola.agent.Reply;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -22,13 +20,6 @@ import org.springframework.util.StringUtils;
 public class ChatService {
 
     private static final int TITLE_MAX_LENGTH = 60;
-
-    /**
-     * The words that end a marketing conversation. Recognised before anything else happens: a
-     * person asking to be left alone must not wait on a model call, and must not be charged one.
-     */
-    private static final Set<String> OPT_OUT =
-            Set.of("stop", "stopall", "unsubscribe", "end", "quit", "optout", "opt out", "opt-out");
 
     private static final String OPT_OUT_REPLY =
             "You're unsubscribed and won't hear from us again. Sorry for the interruption.";
@@ -78,7 +69,7 @@ public class ChatService {
         }
         ConversationSummary conversation = get(conversationId);
 
-        if (isOptOut(text)) {
+        if (OptOut.matches(text)) {
             record(conversationId, text, OPT_OUT_REPLY);
             conversations.close(conversationId, ConversationSummary.OPTED_OUT, text.strip());
             updateLead(conversation.leadId(), Lead.OPTED_OUT);
@@ -132,11 +123,6 @@ public class ChatService {
         if (leadId != null) {
             leads.updateStatus(leadId, status);
         }
-    }
-
-    private static boolean isOptOut(String text) {
-        String normalised = text.strip().toLowerCase(Locale.ROOT).replaceAll("[.!]+$", "");
-        return OPT_OUT.contains(normalised);
     }
 
     private void requireConversation(UUID conversationId) {
