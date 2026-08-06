@@ -7,6 +7,8 @@
   - Booking a callback session (minimal calendar implementation)
 - Admins can approve conversations or log comments against them (minimal UX)
 - Prompts are stored, rather than hardcoded. Admins can edit. Past versions are stored.
+- A claude skill that looks at comments and suggests prompt improvements.
+
 
 ## Running it
 
@@ -67,6 +69,38 @@ resuming, and picking up an existing lead.
   A conversation is pinned to the versions it opened with, so review shows what it actually ran
   on and whether that is still in force.
 
+### Suggesting prompt improvements
+
+`.claude/skills/suggest-prompt-improvement/` is a Claude Code skill that reads the reviews and
+proposes a prompt edit. Open Claude Code in the repo root and either run it by name:
+
+```
+/suggest-prompt-improvement
+```
+
+or just ask for what it does — "why are these conversations rated badly?", "turn the review
+comments into a prompt change" — and it will be picked up.
+
+It needs Postgres running (`docker compose up -d`); the app itself does not have to be. It reads
+the ratings, the comments, the full transcripts including tool calls, and the prompt versions
+each conversation actually ran on, then proposes the smallest edit that addresses the pattern —
+with the evidence behind it and what the change might cost.
+
+**It only suggests.** Applying a change is yours: paste it into `/admin/prompts/{kind}`, which
+appends a new current version and leaves the old one readable. Editing `knowledge/*.md` instead
+changes only what a *fresh* database gets seeded with — a database that already has prompts is
+never re-seeded.
+
+The script it uses is worth having on its own for a look at the data:
+
+```bash
+S=.claude/skills/suggest-prompt-improvement/gather.sh
+$S reviews --max-rating 3   # reviewed conversations, worst first, as JSON
+$S conversation <uuid>      # one conversation in full
+$S prompts                  # every prompt version and which is live
+$S prompt BRIEF             # the live body of one
+```
+
 ### Tests
 
 ```bash
@@ -87,10 +121,6 @@ ENROLA_URL=http://localhost:8181 ./chat.sh
 Worth knowing: the model is set by `openai.model` in `application.properties`, the diary runs on
 `booking.timezone` (Australia/Sydney) weekdays 8am–6pm, and `sms.max-parts` caps how long a reply
 may run.
-
-## Todo
-
-- A claude skill that looks at comments and suggests prompt improvements.
 
 ## Deliberately out of scope
 - Calendly integration
