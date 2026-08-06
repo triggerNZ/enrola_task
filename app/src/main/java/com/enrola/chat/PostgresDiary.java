@@ -3,6 +3,7 @@ package com.enrola.chat;
 import com.enrola.agent.BookingOutcome;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -73,24 +74,27 @@ class PostgresDiary implements Diary {
     }
 
     @Override
-    public BookingOutcome.Unavailable nextAvailable(int count) {
-        return new BookingOutcome.Unavailable("", free(count, null));
+    public BookingOutcome.Unavailable nextAvailable(LocalDate from, int count) {
+        Instant first = from == null ? null : from.atStartOfDay(rules.zone()).toInstant();
+        return new BookingOutcome.Unavailable("", free(count, first, null));
     }
 
     private BookingOutcome.Unavailable offer(String because, Instant wanted) {
-        return new BookingOutcome.Unavailable(because, free(alternatives, wanted));
+        return new BookingOutcome.Unavailable(because, free(alternatives, null, wanted));
     }
 
     /**
      * Free slots: nearest to {@code wanted} when there is one, soonest otherwise. Returned in
      * time order either way, because reading three times out of order at someone is unkind.
      */
-    private List<ZonedDateTime> free(int count, Instant wanted) {
+    private List<ZonedDateTime> free(int count, Instant requestedFrom, Instant wanted) {
         Instant earliest = rules.earliest();
         Instant from =
-                wanted == null || wanted.minus(LOOK_BACK).isBefore(earliest)
-                        ? earliest
-                        : wanted.minus(LOOK_BACK);
+                requestedFrom != null
+                        ? (requestedFrom.isBefore(earliest) ? earliest : requestedFrom)
+                        : wanted == null || wanted.minus(LOOK_BACK).isBefore(earliest)
+                                ? earliest
+                                : wanted.minus(LOOK_BACK);
 
         List<Instant> candidates = rules.slotsFrom(from, CANDIDATES);
         if (candidates.isEmpty()) {

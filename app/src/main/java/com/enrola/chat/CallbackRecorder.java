@@ -3,6 +3,7 @@ package com.enrola.chat;
 import com.enrola.agent.BookingOutcome;
 import com.enrola.agent.CallbackTool;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.UUID;
@@ -61,8 +62,8 @@ class CallbackRecorder implements CallbackTool {
     }
 
     @Override
-    public BookingOutcome.Unavailable nextAvailable(int count) {
-        return diary.nextAvailable(count);
+    public BookingOutcome.Unavailable nextAvailable(LocalDate from, int count) {
+        return diary.nextAvailable(from, count);
     }
 
     private static String note(BookingOutcome.Booked booked, String topic) {

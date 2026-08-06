@@ -1,6 +1,7 @@
 package com.enrola.agent;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 /**
  * What happens when the agent decides someone is ready to speak to a consultant.
@@ -23,6 +24,11 @@ public interface CallbackTool {
      */
     BookingOutcome arrangeCallback(Object memoryId, Instant startsAt, String theirWords, String topic);
 
-    /** The next free slots, for offering times before anyone has named one. */
-    BookingOutcome.Unavailable nextAvailable(int count);
+    /** The next free slots on or after a date, or from now when {@code from} is null. */
+    BookingOutcome.Unavailable nextAvailable(LocalDate from, int count);
+
+    /** The next free slots from now, for offering times before anyone has named a day. */
+    default BookingOutcome.Unavailable nextAvailable(int count) {
+        return nextAvailable(null, count);
+    }
 }

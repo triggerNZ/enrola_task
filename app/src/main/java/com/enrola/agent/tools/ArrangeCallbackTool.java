@@ -6,6 +6,7 @@ import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.ToolMemoryId;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -45,7 +46,8 @@ public class ArrangeCallbackTool {
             value =
                     "Book a 15-minute call with a consultant. Use when the person agrees to a call, asks"
                         + " what they personally should buy, or asks something you cannot answer from the"
-                        + " FAQ or the catalogue. Call it with no time to be told what is free.")
+                        + " FAQ or the catalogue. Call it with no time to be told what is free; use"
+                        + " from_date when they named a day but not a time.")
     public String arrangeCallback(
             // Which conversation to close. langchain4j fills this in and leaves it out of the
             // schema, so the model never sees it and cannot get it wrong.
@@ -62,6 +64,13 @@ public class ArrangeCallbackTool {
                             required = false)
                     String startsAt,
             @P(
+                            name = "from_date",
+                            value =
+                                    "The first day to offer when the person named a day but not a"
+                                        + " time, as YYYY-MM-DD. Leave it out to offer from now.",
+                            required = false)
+                    String fromDate,
+            @P(
                             name = "their_words",
                             value = "When they asked for, in their own words: 'tomorrow arvo'.",
                             required = false)
@@ -69,7 +78,11 @@ public class ArrangeCallbackTool {
             @P(value = "What they want to discuss, if they said.", required = false) String topic) {
 
         if (!StringUtils.hasText(startsAt)) {
-            return offers(callbacks.nextAvailable(3), "No time given yet.");
+            LocalDate from = parseDate(fromDate);
+            if (StringUtils.hasText(fromDate) && from == null) {
+                return "That date did not make sense. Ask which day suits.";
+            }
+            return offers(callbacks.nextAvailable(from, 3), "No exact time given yet.");
         }
 
         Instant wanted = parse(startsAt);
@@ -141,6 +154,18 @@ public class ArrangeCallbackTool {
             } catch (DateTimeParseException e) {
                 return null;
             }
+        }
+    }
+
+    /** Null when the model sent no date, or something other than an ISO calendar date. */
+    private static LocalDate parseDate(String text) {
+        if (!StringUtils.hasText(text)) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(text.strip());
+        } catch (DateTimeParseException e) {
+            return null;
         }
     }
 }

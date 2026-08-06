@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.enrola.agent.BookingOutcome;
 import com.enrola.agent.CallbackTool;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -21,6 +23,7 @@ class ArrangeCallbackToolTest {
 
     private static final ZoneId SYDNEY = ZoneId.of("Australia/Sydney");
     private final UUID conversationId = UUID.randomUUID();
+    private LocalDate requestedFrom;
 
     private static ZonedDateTime at(String localDateTime) {
         return LocalDateTime.parse(localDateTime).atZone(SYDNEY);
@@ -37,9 +40,14 @@ class ArrangeCallbackToolTest {
                     }
 
                     @Override
-                    public BookingOutcome.Unavailable nextAvailable(int count) {
+                    public BookingOutcome.Unavailable nextAvailable(LocalDate from, int count) {
+                        requestedFrom = from;
+                        LocalDate day = from == null ? LocalDate.parse("2026-08-06") : from;
                         return new BookingOutcome.Unavailable(
-                                "", List.of(at("2026-08-06T09:30"), at("2026-08-06T09:45")));
+                                "",
+                                List.of(
+                                        day.atTime(LocalTime.of(9, 30)).atZone(SYDNEY),
+                                        day.atTime(LocalTime.of(9, 45)).atZone(SYDNEY)));
                     }
                 },
                 SYDNEY);
@@ -50,7 +58,12 @@ class ArrangeCallbackToolTest {
     void bookedNamesTheWholeThing() {
         String result =
                 toolReturning(new BookingOutcome.Booked(at("2026-08-06T14:15")))
-                        .arrangeCallback(conversationId, "2026-08-06T14:15", "tomorrow arvo", "price");
+                        .arrangeCallback(
+                                conversationId,
+                                "2026-08-06T14:15",
+                                null,
+                                "tomorrow arvo",
+                                "price");
 
         assertThat(result).startsWith("Booked: Thu 6 Aug 2:15pm AEST");
         assertThat(result).contains("Confirm it back");
@@ -61,7 +74,7 @@ class ArrangeCallbackToolTest {
     void wholeHoursAreSaidPlainly() {
         String result =
                 toolReturning(new BookingOutcome.Booked(at("2026-08-06T15:00")))
-                        .arrangeCallback(conversationId, "2026-08-06T15:00", null, null);
+                        .arrangeCallback(conversationId, "2026-08-06T15:00", null, null, null);
 
         assertThat(result).contains("3pm").doesNotContain("3:00");
     }
@@ -74,7 +87,7 @@ class ArrangeCallbackToolTest {
                                 new BookingOutcome.Unavailable(
                                         "that one is taken",
                                         List.of(at("2026-08-06T13:45"), at("2026-08-06T14:30"))))
-                        .arrangeCallback(conversationId, "2026-08-06T14:00", null, null);
+                        .arrangeCallback(conversationId, "2026-08-06T14:00", null, null, null);
 
         assertThat(result)
                 .startsWith("Not booked - that one is taken.")
@@ -94,7 +107,7 @@ class ArrangeCallbackToolTest {
                                                 at("2026-08-06T13:45"),
                                                 at("2026-08-06T14:30"),
                                                 at("2026-08-07T08:00"))))
-                        .arrangeCallback(conversationId, "2026-08-06T14:00", null, null);
+                        .arrangeCallback(conversationId, "2026-08-06T14:00", null, null, null);
 
         assertThat(result).containsOnlyOnce("Thu 6 Aug").contains("Fri 7 Aug 8am");
     }
@@ -104,9 +117,34 @@ class ArrangeCallbackToolTest {
     void noTimeAsksTheDiary() {
         String result =
                 toolReturning(new BookingOutcome.Booked(at("2026-08-06T14:15")))
-                        .arrangeCallback(conversationId, null, null, null);
+                        .arrangeCallback(conversationId, null, null, null, null);
 
-        assertThat(result).startsWith("No time given yet.").contains("9:30am").contains("9:45am");
+        assertThat(result)
+                .startsWith("No exact time given yet.")
+                .contains("9:30am")
+                .contains("9:45am");
+        assertThat(requestedFrom).isNull();
+    }
+
+    @Test
+    @DisplayName("a named date offers slots from that date")
+    void dateWithoutTimeStartsAvailabilityThere() {
+        String result =
+                toolReturning(new BookingOutcome.Booked(at("2026-08-06T14:15")))
+                        .arrangeCallback(conversationId, null, "2026-08-10", null, null);
+
+        assertThat(requestedFrom).isEqualTo(LocalDate.parse("2026-08-10"));
+        assertThat(result).contains("Mon 10 Aug 9:30am").contains("9:45am");
+    }
+
+    @Test
+    @DisplayName("an invalid availability date is rejected rather than silently using today")
+    void invalidFromDateIsRejected() {
+        String result =
+                toolReturning(new BookingOutcome.Booked(at("2026-08-06T14:15")))
+                        .arrangeCallback(conversationId, null, "next Monday", null, null);
+
+        assertThat(result).contains("date did not make sense").contains("Ask which day suits");
     }
 
     @Test
@@ -114,7 +152,7 @@ class ArrangeCallbackToolTest {
     void nonsenseTimeIsHandled() {
         String result =
                 toolReturning(new BookingOutcome.Booked(at("2026-08-06T14:15")))
-                        .arrangeCallback(conversationId, "tomorrow arvo", null, null);
+                        .arrangeCallback(conversationId, "tomorrow arvo", null, null, null);
 
         assertThat(result).startsWith("That time did not make sense.").contains("9:30am");
     }
@@ -124,7 +162,7 @@ class ArrangeCallbackToolTest {
     void anEmptyDiaryIsSaidPlainly() {
         String result =
                 toolReturning(new BookingOutcome.Unavailable("that one is taken", List.of()))
-                        .arrangeCallback(conversationId, "2026-08-06T14:00", null, null);
+                        .arrangeCallback(conversationId, "2026-08-06T14:00", null, null, null);
 
         assertThat(result).contains("Nothing is free").contains("Apologise");
     }

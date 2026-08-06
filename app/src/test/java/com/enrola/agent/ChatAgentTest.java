@@ -19,6 +19,7 @@ import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayDeque;
@@ -100,7 +101,7 @@ class ChatAgentTest {
         }
 
         @Override
-        public BookingOutcome.Unavailable nextAvailable(int count) {
+        public BookingOutcome.Unavailable nextAvailable(LocalDate from, int count) {
             return new BookingOutcome.Unavailable(
                     "", List.of(SLOT.atZone(SYDNEY), SLOT.plusSeconds(900).atZone(SYDNEY)));
         }

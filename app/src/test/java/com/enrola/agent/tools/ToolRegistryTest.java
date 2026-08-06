@@ -11,6 +11,7 @@ import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.model.chat.request.json.JsonEnumSchema;
 import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -42,6 +43,7 @@ class ToolRegistryTest {
         Instant startsAt;
         String theirWords;
         String topic;
+        LocalDate fromDate;
         int calls;
 
         @Override
@@ -56,7 +58,8 @@ class ToolRegistryTest {
         }
 
         @Override
-        public BookingOutcome.Unavailable nextAvailable(int count) {
+        public BookingOutcome.Unavailable nextAvailable(LocalDate from, int count) {
+            this.fromDate = from;
             return new BookingOutcome.Unavailable("", List.of());
         }
     }
@@ -109,7 +112,8 @@ class ToolRegistryTest {
         UUID conversationId = UUID.randomUUID();
         JsonObjectSchema parameters = specification("arrange_callback").parameters();
 
-        assertThat(parameters.properties()).containsOnlyKeys("starts_at", "their_words", "topic");
+        assertThat(parameters.properties())
+                .containsOnlyKeys("starts_at", "from_date", "their_words", "topic");
 
         registry
                 .find("arrange_callback")
@@ -127,6 +131,22 @@ class ToolRegistryTest {
                 .isEqualTo(LocalDateTime.parse("2026-08-06T14:15").atZone(SYDNEY).toInstant());
         assertThat(callbacks.theirWords).isEqualTo("tomorrow arvo");
         assertThat(callbacks.topic).isEqualTo("price");
+    }
+
+    @Test
+    @DisplayName("a date without a time is passed to availability rather than treated as a booking")
+    void fromDateIsBound() {
+        String result =
+                registry
+                        .find("arrange_callback")
+                        .orElseThrow()
+                        .execute(
+                                call("arrange_callback", "{\"from_date\":\"2026-08-10\"}"),
+                                UUID.randomUUID());
+
+        assertThat(callbacks.fromDate).isEqualTo(LocalDate.parse("2026-08-10"));
+        assertThat(callbacks.calls).isZero();
+        assertThat(result).contains("Nothing is free");
     }
 
     @Test

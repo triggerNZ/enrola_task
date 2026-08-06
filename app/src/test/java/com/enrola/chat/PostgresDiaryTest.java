@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.enrola.agent.BookingOutcome;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -164,6 +165,18 @@ class PostgresDiaryTest {
         assertThat(offers.alternatives()).hasSize(3);
         assertThat(instants(offers.alternatives())).isSorted();
         assertThat(instants(offers.alternatives()).get(0)).isAfterOrEqualTo(at("2026-08-06T09:30"));
+    }
+
+    @Test
+    @DisplayName("availability can start from a given business date")
+    void nextAvailableStartsFromDate() {
+        BookingOutcome.Unavailable offers = diary.nextAvailable(LocalDate.parse("2026-08-10"), 3);
+
+        assertThat(instants(offers.alternatives()))
+                .containsExactly(
+                        at("2026-08-10T08:00"),
+                        at("2026-08-10T08:15"),
+                        at("2026-08-10T08:30"));
     }
 
     @Test

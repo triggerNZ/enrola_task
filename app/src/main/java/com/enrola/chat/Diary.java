@@ -2,6 +2,7 @@ package com.enrola.chat;
 
 import com.enrola.agent.BookingOutcome;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -21,6 +22,14 @@ public interface Diary {
      */
     BookingOutcome book(UUID conversationId, UUID leadId, Instant startsAt, String words, String topic);
 
-    /** The next free slots from now, for offering times before anyone has named one. */
-    BookingOutcome.Unavailable nextAvailable(int count);
+    /**
+     * The next free slots on or after {@code from}, in the diary's business timezone. A null date
+     * starts from the earliest currently bookable slot.
+     */
+    BookingOutcome.Unavailable nextAvailable(LocalDate from, int count);
+
+    /** The next free slots from now, for offering times before anyone has named a day. */
+    default BookingOutcome.Unavailable nextAvailable(int count) {
+        return nextAvailable(null, count);
+    }
 }
